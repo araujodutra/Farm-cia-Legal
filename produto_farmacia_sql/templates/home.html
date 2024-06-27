@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Materiais Elétricos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Materiais Elétricos</h1>
+        
+        <h2 class="mt-4">Lista de Materiais</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materiais %}
+                <tr>
+                    <td>{{ material.nome }}</td>
+                    <td>{{ material.preco }}</td>
+                    <td>
+                        <button class="btn btn-danger delete-btn" data-material-id="{{ material.id }}">Excluir</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h2 class="mt-4">Adicionar Material</h2>
+        <form action="/add-material" method="post" class="mb-4">
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" id="nome" name="nome" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="preco" class="form-label">Preço:</label>
+                <input type="number" step="0.01" id="preco" name="preco" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+
+        <h2 class="mt-4">Pesquisar Material</h2>
+        <form action="/search" method="get">
+            <div class="mb-3">
+                <label for="search_nome" class="form-label">Nome:</label>
+                <input type="text" id="search_nome" name="nome" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-secondary">Pesquisar</button>
+        </form>
+
+        {% if resultado is defined %}
+        <h2 class="mt-4">Resultado da Pesquisa</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in resultado %}
+                <tr>
+                    <td>{{ material.nome }}</td>
+                    <td>{{ material.preco }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    <script>
+        // Seleciona todos os botões de exclusão
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+
+        // Adiciona um ouvinte de evento de clique a cada botão
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const materialId = button.dataset.materialId;
+                try {
+                    // Envia uma solicitação DELETE para o endpoint correspondente ao material ID
+                    const response = await fetch(`/material/${materialId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) {
+                        throw new Error('Erro ao excluir o material.');
+                    }
+                    // Recarrega a página após a exclusão bem-sucedida
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Erro:', error);
+                    // Você pode exibir uma mensagem de erro ao usuário se desejar
+                }
+            });
+        });
+    </script>
+</body>
+</html>
